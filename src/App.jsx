@@ -1,26 +1,50 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
+import Header from './components/Header'
+import SystemBriefing from './components/SystemBriefing'
+import RankingPanel from './components/RankingPanel'
+import PracticeRoom from './components/PracticeRoom'
+import MainTypingTest from './components/MainTypingTest'
+import WaitingRoom from './components/WaitingRoom'
+import HostWaitingRoom from './components/HostWaitingRoom'
+import DevMenu from './components/DevMenu'
+import StarfieldBackground from './components/StarfieldBackground'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [statusPills, setStatusPills] = useState(['PRACTICE', '--:--'])
+  const [view, setView] = useState('briefing')
+
+  const handleDevNavigation = (newView) => {
+    setView(newView)
+  }
 
   return (
-    <>
-      <div>
-        <h1>Vite + React</h1>
-      </div>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="app">
+      <StarfieldBackground />
+      <Header
+        title=""
+        statusPills={view === 'practice' || view === 'waiting' || view === 'main-typing' ? statusPills : []}
+        isPractice={view === 'practice' || view === 'waiting' || view === 'host-waiting' || view === 'main-typing'}
+        isWaitingRoom={view === 'waiting' || view === 'host-waiting'}
+      />
+      <main className="main-content">
+        {view === 'practice' ? (
+          <PracticeRoom onStatusChange={setStatusPills} onProceed={() => setView('waiting')} onBackClick={() => setView('briefing')} />
+        ) : view === 'main-typing' ? (
+          <MainTypingTest onStatusChange={setStatusPills} onProceed={() => setView('waiting')} onBackClick={() => setView('briefing')} />
+        ) : view === 'waiting' ? (
+          <WaitingRoom onStatusChange={setStatusPills} />
+        ) : view === 'host-waiting' ? (
+          <HostWaitingRoom onStatusChange={setStatusPills} onStart={() => setView('main-typing')} />
+        ) : (
+          <div className="system-panel">
+            <SystemBriefing onBeginPractice={() => setView('practice')} />
+            <RankingPanel />
+          </div>
+        )}
+      </main>
+      <DevMenu onNavigate={handleDevNavigation} />
+    </div>
   )
 }
 

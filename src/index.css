@@ -1,45 +1,139 @@
+@font-face {
+  font-family: 'Akira Expanded';
+  src: url('./assets/fonts/AkiraExpanded.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Creato Display';
+  src: url('./assets/fonts/CreatoDisplay.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #3dff9d;
+  background-color: #162215;
+  --ui-font: 'Akira Expanded', 'Courier New', monospace;
+  --body-font: 'Creato Display', 'Courier New', monospace;
+  --code-font: Consolas, Monaco, 'Courier New', monospace;
+  --forest-green: #1F5A44;
+  --deep-olive: #1F2A24;
+  --charcoal-green: #17241F;
+  --hunter-green: #0F5A46;
+  --night-forest: #162215;
+  --light-mint: #3dff9d;
+  --dark-olive: #1E261F;
+  --seafoam-green: #37ff98;
+  --onyx-green: #1C2421;
+  --deep-pine: #103324;
+  --border-green: #34C759;
+  --mint-glow-strong: rgba(61, 255, 157, 0.75);
+  --mint-glow-soft: rgba(61, 255, 157, 0.5);
+  --mint-glow-faint: rgba(61, 255, 157, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'Courier New', monospace;
+  background-color: var(--night-forest);
+  color: var(--light-mint);
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--ui-font);
 }
 
 a {
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: var(--light-mint);
+  text-decoration: none;
 }
+
 a:hover {
-  color: #535bf2;
+  color: var(--seafoam-green);
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
+  border-radius: 2px;
+  border: 2px solid var(--seafoam-green);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-family: 'Courier New', monospace;
+  background-color: transparent;
+  color: var(--light-mint);
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: all 0.3s ease;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+button:hover {
+  background-color: var(--mint-glow-faint);
+  box-shadow: 0 0 10px var(--mint-glow-soft);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--code-font);
+  font-size: 0.9em;
+  background-color: rgba(52, 199, 89, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+pre {
+  padding: 1em;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mint-glow-faint);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--seafoam-green);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--light-mint);
 }

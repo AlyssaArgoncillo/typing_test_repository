@@ -1,0 +1,106 @@
+.dev-menu {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 999;
+  font-family: var(--code-font);
+}
+
+.dev-menu-toggle {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid var(--border-green);
+  background-color: rgba(20, 55, 31, 0.8);
+  color: var(--light-mint);
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 12px var(--mint-glow-soft);
+}
+
+.dev-menu-toggle:hover {
+  background-color: rgba(20, 55, 31, 0.95);
+  box-shadow: 0 0 16px var(--mint-glow-strong);
+  transform: scale(1.05);
+}
+
+.dev-menu-toggle:active {
+  transform: scale(0.95);
+}
+
+.dev-menu.open .dev-menu-toggle {
+  background-color: rgba(21, 94, 58, 0.9);
+  box-shadow: 0 0 16px var(--mint-glow-strong);
+}
+
+.dev-menu-panel {
+  position: absolute;
+  bottom: 5.5rem;
+  right: 0;
+  min-width: 200px;
+  background-color: rgba(12, 24, 16, 0.95);
+  border: 2px solid var(--border-green);
+  border-radius: 6px;
+  box-shadow: 0 0 20px var(--mint-glow-soft), inset 0 0 10px var(--mint-glow-faint);
+  overflow: hidden;
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dev-menu-header {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid rgba(52, 199, 89, 0.5);
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--light-mint);
+  background-color: rgba(21, 94, 58, 0.6);
+}
+
+.dev-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dev-menu-item {
+  padding: 0.6rem 0.8rem;
+  border: none;
+  border-bottom: 1px solid rgba(52, 199, 89, 0.3);
+  background-color: transparent;
+  color: var(--light-mint);
+  font-size: 0.75rem;
+  letter-spacing: 0.8px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--code-font);
+  text-transform: uppercase;
+}
+
+.dev-menu-item:last-child {
+  border-bottom: none;
+}
+
+.dev-menu-item:hover {
+  background-color: rgba(61, 255, 157, 0.1);
+  padding-left: 1rem;
+}
+
+.dev-menu-item:active {
+  background-color: rgba(61, 255, 157, 0.2);
+}
