@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import '../styles/Header.css'
+import ccisLogo from '../assets/logo/ccis_logo.svg'
+import cssLogo from '../assets/logo/css_logo.svg'
 
 export default function Header({
   title = 'SYSTEM_BRIEFING',
@@ -40,7 +42,10 @@ export default function Header({
   return (
     <header className={`header ${isPractice ? 'practice-mode' : ''} ${isWaitingRoom ? 'waiting-room-mode' : ''}`}>
       <div className="header-left">
-        <span className="logo">LOGO</span>
+        <div className="logo">
+          <img src={ccisLogo} alt="CCIS Logo" className="logo-img" />
+          <img src={cssLogo} alt="CSS Logo" className="logo-img" />
+        </div>
       </div>
       <div className="header-center">
         {statusPills.length > 0 && (

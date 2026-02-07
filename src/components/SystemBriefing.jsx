@@ -1,11 +1,16 @@
 import React from 'react'
 import '../styles/SystemBriefing.css'
 
-export default function SystemBriefing({ onBeginPractice }) {
-  const handleEnterRoom = () => {
-    if (onBeginPractice) {
+export default function SystemBriefing({ onBeginPractice, onHostStart }) {
+  // TODO: Replace with actual authentication check from backend
+  // This dummy value should come from user session/token
+  const isAdmin = false // Set to true for admin/host accounts
+
+  const handleEnterEvent = () => {
+    if (isAdmin && onHostStart) {
+      onHostStart()
+    } else if (!isAdmin && onBeginPractice) {
       onBeginPractice()
-      return
     }
   }
 
@@ -17,8 +22,8 @@ export default function SystemBriefing({ onBeginPractice }) {
             <span className="exe-title">TYPINGTEST.EXE</span>
             <span className="exe-path">C:\Users\Welcome to Typing_Test</span>
           </div>
-          <button className="enter-button" onClick={handleEnterRoom}>
-            Begin Practice &gt;&gt;
+          <button className="enter-button" onClick={handleEnterEvent}>
+            Enter event &gt;&gt;
           </button>
         </div>
 

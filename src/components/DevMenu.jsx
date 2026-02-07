@@ -1,3 +1,5 @@
+//remove this component when not needed anymore. make sure to remove the import and usage in App.jsx and the component-specific css as well.
+
 import React, { useState } from 'react'
 import '../styles/DevMenu.css'
 
@@ -10,6 +12,9 @@ export default function DevMenu({ onNavigate }) {
     { label: 'Main Typing Test', view: 'main-typing' },
     { label: 'Waiting Room (User)', view: 'waiting' },
     { label: 'Waiting Room (Host)', view: 'host-waiting' },
+    { label: 'Host Monitoring', view: 'host-monitoring' },
+    { label: 'Leaderboard (User)', view: 'leaderboard-user' },
+    { label: 'Leaderboard (Host)', view: 'host-leaderboard' },
   ]
 
   const handleNavigation = (view) => {

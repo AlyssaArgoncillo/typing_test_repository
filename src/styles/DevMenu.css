@@ -11,7 +11,7 @@
   height: 45px;
   border-radius: 50%;
   border: 2px solid var(--border-green);
-  background-color: rgba(20, 55, 31, 0.8);
+  background-color: rgba(20, 55, 31, 0.92);
   color: var(--light-mint);
   font-size: 0.7rem;
   font-weight: bold;
@@ -22,7 +22,7 @@
 }
 
 .dev-menu-toggle:hover {
-  background-color: rgba(20, 55, 31, 0.95);
+  background-color: rgba(20, 55, 31, 0.98);
   box-shadow: 0 0 16px var(--mint-glow-strong);
   transform: scale(1.05);
 }
@@ -32,7 +32,7 @@
 }
 
 .dev-menu.open .dev-menu-toggle {
-  background-color: rgba(21, 94, 58, 0.9);
+  background-color: rgba(21, 94, 58, 0.95);
   box-shadow: 0 0 16px var(--mint-glow-strong);
 }
 
@@ -41,7 +41,7 @@
   bottom: 5.5rem;
   right: 0;
   min-width: 200px;
-  background-color: rgba(12, 24, 16, 0.95);
+  background-color: rgba(12, 24, 16, 0.98);
   border: 2px solid var(--border-green);
   border-radius: 6px;
   box-shadow: 0 0 20px var(--mint-glow-soft), inset 0 0 10px var(--mint-glow-faint);
@@ -68,7 +68,7 @@
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--light-mint);
-  background-color: rgba(21, 94, 58, 0.6);
+  background-color: rgba(21, 94, 58, 0.75);
 }
 
 .dev-menu-list {

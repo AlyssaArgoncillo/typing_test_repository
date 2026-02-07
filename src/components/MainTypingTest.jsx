@@ -13,7 +13,7 @@ const passages = [
   'finish strong and keep your timing even. each round is a fresh start, so stay sharp and keep moving forward.',
 ]
 
-export default function MainTypingTest({ onStatusChange, onProceed, onBackClick }) {
+export default function MainTypingTest({ onStatusChange, onComplete, onBackClick, onWaitForResults }) {
   const [roundIndex, setRoundIndex] = useState(0)
   const [typedChars, setTypedChars] = useState([])
   const [roundStats, setRoundStats] = useState([])
@@ -66,11 +66,11 @@ export default function MainTypingTest({ onStatusChange, onProceed, onBackClick 
     setCountdownValue(3)
     setOverlayPhase('init')
 
-    overlayTimersRef.current.push(setTimeout(() => setOverlayPhase('round'), 3000))
-    overlayTimersRef.current.push(setTimeout(() => setOverlayPhase('countdown'), 6000))
-    overlayTimersRef.current.push(setTimeout(() => setCountdownValue(2), 7000))
-    overlayTimersRef.current.push(setTimeout(() => setCountdownValue(1), 8000))
-    overlayTimersRef.current.push(setTimeout(() => setOverlayPhase('none'), 9000))
+    overlayTimersRef.current.push(setTimeout(() => setOverlayPhase('round'), 2000))
+    overlayTimersRef.current.push(setTimeout(() => setOverlayPhase('countdown'), 4000))
+    overlayTimersRef.current.push(setTimeout(() => setCountdownValue(2), 5000))
+    overlayTimersRef.current.push(setTimeout(() => setCountdownValue(1), 6000))
+    overlayTimersRef.current.push(setTimeout(() => setOverlayPhase('none'), 7000))
 
     return () => {
       overlayTimersRef.current.forEach((timer) => clearTimeout(timer))
@@ -159,8 +159,11 @@ export default function MainTypingTest({ onStatusChange, onProceed, onBackClick 
       resultTimerRef.current = null
     }
     if (roundIndex >= passages.length - 1) {
+      // Final round complete - go to waiting room to wait for other players
       setOverlayPhase('none')
-      setShowSummary(true)
+      if (onWaitForResults) {
+        onWaitForResults()
+      }
       return
     }
 
@@ -173,19 +176,20 @@ export default function MainTypingTest({ onStatusChange, onProceed, onBackClick 
   const finalizeRound = () => {
     if (advancingRef.current) return
     advancingRef.current = true
-    const correctCount = typedChars.filter((item) => item.correct).length
-    const totalCount = passage.length
-    const hasData = typedChars.length > 0
-    const accuracy = hasData ? typingService.computeAccuracy(correctCount, totalCount) : null
-    const elapsedSeconds = Math.max(1, 60 - timeLeft)
-    const wpm = hasData ? typingService.computeWpm(typedChars.length, elapsedSeconds) : null
-
-    // Add this round's result to progressData
-    const updatedProgressData = {
-      timePoints: [...progressData.timePoints, elapsedSeconds],
-      wpmData: [...progressData.wpmData, wpm || 0],
-      accuracyData: [...progressData.accuracyData, accuracy || 0],
-    }
+    const {
+      accuracy,
+      wpm,
+      hasData,
+      correctCount,
+      totalCount,
+      updatedProgressData,
+    } = typingService.buildRoundResult({
+      typedChars,
+      passageLength: passage.length,
+      timeLeft,
+      roundIndex,
+      progressData,
+    })
 
     setRoundStats((prev) => {
       const updated = [...prev]
@@ -214,12 +218,11 @@ export default function MainTypingTest({ onStatusChange, onProceed, onBackClick 
     setRoundIndex(0)
     setTypedChars([])
     setRoundStats([])
+    setProgressData({ wpmData: [], accuracyData: [], timePoints: [] })
     setShowSummary(false)
   }
 
-  const averageAccuracy = roundStats.length
-    ? Math.round(roundStats.reduce((sum, stat) => sum + (stat?.accuracy || 0), 0) / roundStats.length)
-    : 0
+  const averageAccuracy = typingService.computeAverageAccuracy(roundStats)
 
   const wordCount = useMemo(() => typingService.computeWordCount(typedChars), [typedChars])
 
@@ -265,52 +268,110 @@ export default function MainTypingTest({ onStatusChange, onProceed, onBackClick 
                       <LineChart
                         key={`chart-${resultOverlay.progressData?.timePoints?.length || 0}`}
                         xAxis={[{ 
-                          data: resultOverlay.progressData?.timePoints || [0],
-                          label: 'Time (seconds)',
-                          type: 'point',
-                          min: 0,
-                          max: 60,
+                          data: resultOverlay.progressData?.timePoints || [1],
+                          scaleType: 'point',
                         }]}
-                        yAxis={[{ 
-                          label: 'Accuracy',
-                        }]}
+                        yAxis={[
+                          { 
+                            id: 'wpm',
+                            position: 'left',
+                            min: 0,
+                          },
+                          { 
+                            id: 'accuracy',
+                            position: 'right',
+                            min: 0,
+                            max: 100,
+                          },
+                        ]}
                         series={[
                           {
+                            yAxisKey: 'wpm',
                             data: resultOverlay.progressData?.wpmData || [0],
-                            label: 'Words Per Minute',
+                            label: 'WPM',
                             color: '#8BF99A',
                             showMark: true,
                             curve: 'linear',
                           },
                           {
+                            yAxisKey: 'accuracy',
                             data: resultOverlay.progressData?.accuracyData || [0],
                             label: 'Accuracy',
-                            color: '#3DFF9D',
+                            color: '#FFFF00',
                             showMark: true,
                             curve: 'linear',
                           },
                         ]}
                         width={600}
                         height={250}
-                        margin={{ top: 5, right: 10, bottom: 25, left: 35 }}
-                        slotProps={{ legend: { hidden: true } }}
+                        margin={{ top: 35, right: 50, bottom: 35, left: 50 }}
+                        slotProps={{ 
+                          legend: { 
+                            hidden: false,
+                            direction: 'row',
+                            position: { vertical: 'top', horizontal: 'middle' },
+                            padding: { top: 5, bottom: 10 },
+                            itemMarkWidth: 12,
+                            itemMarkHeight: 12,
+                            markGap: 6,
+                            itemGap: 20,
+                            labelStyle: {
+                              fill: '#8BF99A',
+                              fontSize: '0.95rem',
+                              fontWeight: 600,
+                            },
+                          }
+                        }}
+                        tooltip={{ trigger: 'item' }}
                       sx={{
                         backgroundColor: 'rgba(8, 18, 12, 0.5)',
-                        '& .MuiChartsAxis-line': { stroke: '#8BF99A !important' },
-                        '& .MuiChartsAxis-tick': { stroke: '#8BF99A !important' },
-                        '& .MuiChartsAxis-tickLabel': { fill: '#8BF99A !important', fontSize: '0.875rem' },
-                        '& .MuiChartsAxis-label': { fill: '#8BF99A !important', fontSize: '0.875rem' },
-                        '& text': { fill: '#8BF99A !important' },
-                        '& tspan': { fill: '#8BF99A !important' },
-                        '& .MuiChartsLegend-series': { '& text': { fill: '#8BF99A !important' } },
-                        '& .MuiChartsLegend-root': { '& text': { fill: '#8BF99A !important' } },
-                        '& .MuiChartsGrid-line': { stroke: 'rgba(139, 249, 154, 0.15) !important' },
-                        '& .MuiTooltip-root': { '& .MuiTooltip-tooltip': { backgroundColor: 'rgba(8, 18, 12, 0.95)', color: '#8BF99A' } },
+                        '& .MuiChartsAxis-line': { stroke: '#C5FDD0 !important' },
+                        '& .MuiChartsAxis-tick': { stroke: '#C5FDD0 !important' },
+                        '& .MuiChartsAxis-tickLabel': { fill: '#E0FFE8 !important', fontSize: '0.9rem', fontWeight: 500 },
+                        '& .MuiChartsAxis-label': { fill: '#E0FFE8 !important', fontSize: '0.9rem', fontWeight: 600 },
+                        '& .MuiChartsLegend-root': { 
+                          fill: '#8BF99A !important',
+                          color: '#8BF99A !important',
+                        },
+                        '& .MuiChartsLegend-series': { 
+                          fill: '#8BF99A !important',
+                          color: '#8BF99A !important',
+                        },
+                        '& .MuiChartsLegend-series text': { 
+                          fill: '#8BF99A !important',
+                          color: '#8BF99A !important',
+                          fontSize: '0.95rem !important',
+                          fontWeight: '600 !important',
+                        },
+                        '& .MuiChartsLegend-label': {
+                          fill: '#8BF99A !important',
+                          color: '#8BF99A !important',
+                        },
+                        '& text': {
+                          fill: '#8BF99A !important',
+                        },
+                        '& .MuiChartsLegend-mark': { rx: 2 },
+                        '& .MuiChartsGrid-line': { stroke: 'rgba(197, 253, 208, 0.15) !important' },
                         '& .MuiLineElement-root': { strokeWidth: 3 },
                         '& .MuiMarkElement-root': {
-                          fill: 'rgba(8, 18, 12, 0.9)',
-                          stroke: '#8BF99A !important',
-                          strokeWidth: 2,
+                          fill: '#265C3D',
+                          stroke: '#8BF99A',
+                          strokeWidth: 2.5,
+                          r: 6,
+                          '&:hover': {
+                            stroke: '#3DFF9D',
+                            r: 8,
+                            strokeWidth: 3.5,
+                            cursor: 'pointer',
+                          },
+                        },
+                        '& .MuiChartsTooltip-root': {
+                          backgroundColor: '#265C3D !important',
+                          border: '1px solid #C5FDD0',
+                          borderRadius: '4px',
+                        },
+                        '& .MuiChartsTooltip-table': {
+                          '& td': { color: '#E0FFE8 !important', fontSize: '0.9rem' },
                         },
                       }}
                     />
@@ -352,9 +413,6 @@ export default function MainTypingTest({ onStatusChange, onProceed, onBackClick 
           </div>
           <div className="practice-actions">
             <button className="action-button" onClick={handleRestart}>Restart Test</button>
-            {onProceed && (
-              <button className="action-button primary" onClick={onProceed}>Proceed to Lobby</button>
-            )}
           </div>
         </div>
       ) : (

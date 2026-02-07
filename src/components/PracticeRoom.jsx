@@ -79,6 +79,11 @@ export default function PracticeRoom({ onStatusChange, onProceed, onBackClick })
           &lt;&lt; Back
         </button>
       )}
+      {onProceed && !isComplete && (
+        <button className="practice-skip-button" onClick={onProceed}>
+          Skip to Lobby &gt;&gt;
+        </button>
+      )}
       <div
         className="practice-panel"
         role="textbox"

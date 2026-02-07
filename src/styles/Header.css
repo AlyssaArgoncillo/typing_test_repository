@@ -19,11 +19,16 @@
 }
 
 .logo {
-  font-size: 1.2rem;
-  font-weight: bold;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  font-family: var(--body-font);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-img {
+  height: 2.5rem;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.92;
 }
 
 .header-center {

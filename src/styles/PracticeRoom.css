@@ -9,10 +9,10 @@
   position: relative;
 }
 
-.practice-back-button {
+.practice-back-button,
+.practice-skip-button {
   position: fixed;
   top: 5rem;
-  left: 1.5rem;
   z-index: 15;
   padding: 0.5rem 1.2rem;
   min-height: 32px;
@@ -29,12 +29,22 @@
   border-radius: 6px;
 }
 
-.practice-back-button:hover {
+.practice-back-button {
+  left: 1.5rem;
+}
+
+.practice-skip-button {
+  right: 1.5rem;
+}
+
+.practice-back-button:hover,
+.practice-skip-button:hover {
   background-color: rgba(139, 249, 154, 0.24);
   box-shadow: 0 0 10px var(--mint-glow-strong);
 }
 
-.practice-back-button:active {
+.practice-back-button:active,
+.practice-skip-button:active {
   transform: scale(0.98);
 }
 

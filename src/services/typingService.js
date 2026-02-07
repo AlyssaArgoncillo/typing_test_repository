@@ -38,6 +38,35 @@ const typingService = {
     return words.length
   },
 
+  computeAverageAccuracy(roundStats) {
+    if (!roundStats.length) return 0
+    const total = roundStats.reduce((sum, stat) => sum + (stat?.accuracy || 0), 0)
+    return Math.round(total / roundStats.length)
+  },
+
+  buildRoundResult({ typedChars, passageLength, timeLeft, roundIndex, progressData }) {
+    const correctCount = typedChars.filter((item) => item.correct).length
+    const totalCount = passageLength
+    const hasData = typedChars.length > 0
+    const accuracy = hasData ? this.computeAccuracy(correctCount, totalCount) : null
+    const elapsedSeconds = Math.max(1, 60 - timeLeft)
+    const wpm = hasData ? this.computeWpm(typedChars.length, elapsedSeconds) : null
+    const updatedProgressData = {
+      timePoints: [...progressData.timePoints, roundIndex + 1],
+      wpmData: [...progressData.wpmData, wpm || 0],
+      accuracyData: [...progressData.accuracyData, accuracy || 0],
+    }
+
+    return {
+      correctCount,
+      totalCount,
+      hasData,
+      accuracy,
+      wpm,
+      updatedProgressData,
+    }
+  },
+
   buildResultChart(wpm, accuracy, hasData = true) {
     const width = 520
     const height = 200

@@ -15,20 +15,20 @@ const getPingColor = (ping) => {
   return '#E32A2A' // High ping - red
 }
 
-export default function WaitingRoom({ onStatusChange }) {
+export default function WaitingRoom({ onStatusChange, onStart, onComplete, isPostGame }) {
   const [players, setPlayers] = useState([])
 
   // Dummy data - In production, this would come from API/socket
   const dummyPlayers = useMemo(
     () => [
       { id: 1, name: 'Unknown', team: '', ping: '--' },
-      { id: 2, name: 'Player 1', team: 'Team 2', ping: 99 },
-      { id: 3, name: 'Player 2', team: 'Team 1', ping: 99 },
-      { id: 4, name: 'Player 1', team: 'Team 3', ping: 99 },
-      { id: 5, name: 'Player 1', team: 'Team 4', ping: 99 },
-      { id: 6, name: 'Player 3', team: 'Team 1', ping: 87 },
-      { id: 7, name: 'Player 4', team: 'Team 2', ping: 92 },
-      { id: 8, name: 'Player 5', team: 'Team 3', ping: 85 },
+      { id: 2, name: 'Player 1', team: 'Team Alpha', ping: 99 },
+      { id: 3, name: 'Player 2', team: 'Team Delta', ping: 99 },
+      { id: 4, name: 'Player 1', team: 'Team Gamma', ping: 99 },
+      { id: 5, name: 'Player 1', team: 'Team Beta', ping: 99 },
+      { id: 6, name: 'Player 3', team: 'Team Alpha', ping: 87 },
+      { id: 7, name: 'Player 4', team: 'Team Delta', ping: 92 },
+      { id: 8, name: 'Player 5', team: 'Team Gamma', ping: 85 },
     ],
     [],
   )
@@ -72,33 +72,73 @@ export default function WaitingRoom({ onStatusChange }) {
     onStatusChange(['WAITING', '--:--'])
   }, [onStatusChange])
 
+  // TODO: In production, listen for WebSocket event when all players complete
+  // and call onComplete() to transition to leaderboard-user view
+  // Example: socket.on('all-players-complete', () => { if (onComplete) onComplete(); });
+
+  const teamStats = useMemo(() => {
+    const teams = {}
+    players.forEach((player) => {
+      if (!player.team) return
+      teams[player.team] = (teams[player.team] || 0) + 1
+    })
+    return teams
+  }, [players])
+
+  const totalTeams = Object.keys(teamStats).length
+
   return (
-    <section className="waiting-room">
-      <div className="waiting-status">
-        <span className="status-text">Waiting for host to start...</span>
+    <section className="waiting-room lobby-room">
+      <div className="lobby-header">
+        <div className="lobby-title-wrap">
+          <div className="lobby-title">Lobby Status</div>
+          <div className="lobby-subtitle">
+            {isPostGame ? 'Waiting for other players to finish...' : 'Waiting for host to start...'}
+          </div>
+        </div>
+        <div className="lobby-summary-cards">
+          <div className="lobby-card">
+            <span className="lobby-card-label">Players</span>
+            <span className="lobby-card-value">{players.length}</span>
+          </div>
+          <div className="lobby-card">
+            <span className="lobby-card-label">Teams</span>
+            <span className="lobby-card-value">{totalTeams}</span>
+          </div>
+          <div className="lobby-card">
+            <span className="lobby-card-label">Capacity</span>
+            <span className="lobby-card-value">8</span>
+          </div>
+        </div>
       </div>
 
-      <div className="players-panel">
-        <div className={`players-list ${players.length > 5 ? 'scrollable' : ''}`}>
+      <div className="lobby-section">
+        <div className="lobby-section-title">
+          {isPostGame ? 'Player Status' : 'Players Connected'}
+        </div>
+        <div className="lobby-players-grid">
           {players.length === 0 ? (
             <div className="no-players">
               <span className="no-players-text">No players connected</span>
             </div>
           ) : (
             players.map((player) => (
-              <div key={player.id} className="player-row">
-                <span className="player-number">{player.id}</span>
-                <div className="player-avatar">
-                  {generateEmoji(player.id)}
-                </div>
-                <div className="player-info">
-                  <span className="player-name">{player.name}</span>
-                  {player.team && <span className="player-team">{player.team}</span>}
-                </div>
-                <div className="player-ping-container">
-                  <span className="ping-indicator" style={{ color: getPingColor(player.ping) }}>●</span>
-                  <span className="ping-value">{player.ping}</span>
-                  <span className="ping-unit">ms</span>
+              <div key={player.id} className="lobby-player-card">
+                <div className="lobby-player-header">
+                  <div className="player-avatar">
+                    {generateEmoji(player.id)}
+                  </div>
+                  <div className="player-info">
+                    <span className="player-name">{player.name}</span>
+                    {player.team && <span className="player-team">{player.team}</span>}
+                  </div>
+                  {player.ping !== '--' && (
+                    <div className="lobby-ping-card">
+                      <span className="ping-indicator" style={{ color: getPingColor(player.ping) }}>●</span>
+                      <span className="ping-value">{player.ping}</span>
+                      <span className="ping-unit">ms</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))
